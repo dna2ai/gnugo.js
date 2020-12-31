@@ -1,0 +1,151 @@
+<html>
+<body>
+   <div>
+      <button id="start">Start</button>
+      <button id="next">Next</button>
+   </div>
+   <pre id="board"></pre>
+   <script src="./local/gnugo.js"></script>
+   <script>
+      var ui = {
+         start: document.getElementById('start'),
+         next: document.getElementById('next'),
+         board: document.getElementById('board')
+      };
+      var size = 19;
+      var board = [];
+      for (var i = 0; i < size; i++) {
+         board[i] = [];
+         for (var j = 0; j < size; j++) {
+            board[i][j] = 0;
+         }
+      }
+      var hspots = buildHspots(size);
+      ui.start.addEventListener('click', function() {
+         Module._initializeGoGame(size, 0, 0, new Date().getTime());
+         showBoard();
+      });
+      ui.next.addEventListener('click', function () {
+         Module._genNextStep();
+         showBoard(syncBoard(board));
+      });
+
+      function syncBoard(board) {
+         var last = {x: -1, y: -1};
+         for (var i = 0; i < size; i++) {
+            for (var j = 0; j < size; j++) {
+               var s = Module._getBoard(i, j);
+               if (board[i][j] !== s) {
+                  board[i][j] = s
+                  if (Module._isLastMove(i, j)) {
+                     last.x = i;
+                     last.y = j;
+                  }
+               }
+            } // for j
+         } // for i
+         return last;
+      }
+
+      function showBoard(last) {
+         var str = '';
+         str += '  ';
+         for (var i = 0; i < size; i++) {
+            str += ' ' + String.fromCharCode(65 + i);
+         }
+         str += '\n';
+         for (var i = 0; i < size; i++) {
+            var ch = '' + (i + 1);
+            if (ch.length === 1) ch = ' ' + ch;
+            str += ch;
+            for (var j = 0; j < size; j++) {
+               var s = board[i][j];
+               if (last && last.x === i && last.y === j) {
+                  str += '&gt;';
+               } else {
+                  str += ' ';
+               }
+               if (s === 2) {
+                  str += 'X';
+               } else if (s === 1) {
+                  str += 'O';
+               } else {
+                  str += hspots[i][j];
+               }
+            } // for j
+            str += '\n';
+         } // for i
+         ui.board.innerHTML = str;
+      }
+
+      function buildHspots(boardsize) {
+         var hspots = [];
+         for (var i = 0; i < size; i++) {
+            hspots[i] = [];
+            for (var j = 0; j < size; j++) {
+               hspots[i][j] = '.';
+            }
+         }
+
+         if (boardsize == 5) {
+           /* place the outer 4 */
+           hspots[1][1] = '+';
+           hspots[boardsize-2][1] = '+';
+           hspots[1][boardsize-2] = '+';
+           hspots[boardsize-2][boardsize-2] = '+';
+           /* and the middle one */
+           hspots[~~(boardsize/2)][~~(boardsize/2)] = '+';
+           return;
+         }
+
+         if (!(boardsize%2)) {
+           /* If the board size is even, no center handicap spots. */
+           if (boardsize > 2 && boardsize < 12) {
+             /* Place the outer 4 only. */
+             hspots[2][2] = '+';
+             hspots[boardsize-3][2] = '+';
+             hspots[2][boardsize-3] = '+';
+             hspots[boardsize-3][boardsize-3] = '+';
+           }
+           else {
+             /* Place the outer 4 only. */
+             hspots[3][3] = '+';
+             hspots[boardsize-4][3] = '+';
+             hspots[3][boardsize-4] = '+';
+             hspots[boardsize-4][boardsize-4] = '+';
+           }
+         }
+         else {
+           /* Uneven board size */
+           if (boardsize > 2 && boardsize < 12) {
+             /* Place the outer 4... */
+             hspots[2][2] = '+';
+             hspots[boardsize-3][2] = '+';
+             hspots[2][boardsize-3] = '+';
+             hspots[boardsize-3][boardsize-3] = '+';
+
+             /* ...and the middle one. */
+             hspots[~~(boardsize/2)][~~(boardsize/2)] = '+';
+           }
+           else if (boardsize > 12) {
+             /* Place the outer 4... */
+             hspots[3][3] = '+';
+             hspots[boardsize-4][3] = '+';
+             hspots[3][boardsize-4] = '+';
+             hspots[boardsize-4][boardsize-4] = '+';
+
+             /* ...and the inner 4... */
+             hspots[3][~~(boardsize/2)] = '+';
+             hspots[~~(boardsize/2)][3] = '+';
+             hspots[~~(boardsize/2)][boardsize-4] = '+';
+             hspots[boardsize-4][~~(boardsize/2)] = '+';
+
+             /* ...and the middle one. */
+             hspots[~~(boardsize/2)][~~(boardsize/2)] = '+';
+           }
+         }
+         return hspots;
+      }
+   </script>
+</body>
+</html>
