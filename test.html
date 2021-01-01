@@ -1,4 +1,12 @@
 <html>
+<head>
+   <style>
+   .disabled {
+      pointer-events: none;
+      opacity: 0.5;
+   }
+   </style>
+</head>
 <body>
    <div>
       <button id="start">Start</button>
@@ -12,6 +20,7 @@
          next: document.getElementById('next'),
          board: document.getElementById('board')
       };
+      ui.next.classList.add('disabled');
       var size = 19;
       var board = [];
       for (var i = 0; i < size; i++) {
@@ -22,12 +31,16 @@
       }
       var hspots = buildHspots(size);
       ui.start.addEventListener('click', function() {
+         ui.start.classList.add('disabled');
          Module._initializeGoGame(size, 0, 0, new Date().getTime());
          showBoard();
+         ui.next.classList.remove('disabled');
       });
       ui.next.addEventListener('click', function () {
+         ui.next.classList.add('disabled');
          Module._genNextStep();
          showBoard(syncBoard(board));
+         ui.next.classList.remove('disabled');
       });
 
       function syncBoard(board) {
