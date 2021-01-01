@@ -200,12 +200,11 @@ int EMSCRIPTEN_KEEPALIVE getBoard(int i, int j) {
 }
 
 int EMSCRIPTEN_KEEPALIVE moveTo(int i, int j) {
-   int boardSize = -1;
-   char buf[10];
+   int boardSize = board_size;
    sgfGetIntProperty(globalSgfTree.root, "SZ", &boardSize);
-   sprintf(buf, "%c%d", 65 + i, boardSize - j - 1);
-   int move = string_to_location(boardSize, buf);
-   if (move == NO_MOVE) return -1;
+   if (i < 0 || i >= boardSize) return -1;
+   if (j < 0 || j >= boardSize) return -1;
+   int move = POS(i, j);
    if (!is_allowed_move(move, globalGameInfo.to_move)) return -2;
    globalPasses = 0;
    gnugo_play_move(move, globalGameInfo.to_move);

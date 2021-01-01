@@ -7,6 +7,9 @@ port gnugo to javascript with emscripten
 
 `gnugowrapper.c` is the main source file for `gnugo.js` to export APIs from `GNU-Go` (much code copied from `play_ascii.c` from `gnugo` source)
 
+To compile gnugo correctly:
+- disable clock functionality: make `gg_gettimeofday` return 0 directly
+
 Currently we support APIs:
 
 - `Module._initializeGoGame(boardSize, komi, handicap, randomSeed)`
@@ -16,4 +19,5 @@ Currently we support APIs:
 - `Module._genNextStep()`: make computer put current stone at a proper place
 - `Module._moveTo(i, j)`: put current stone at (i,j), where 0 < i,j < size
 
-after compiled out `gnugo.js`, try `test.html` with it.
+after compiled out `gnugo.js`, try `test.html` with it. if want to interact with the board, open browser console panel,
+and try `Module._moveTo(0, 0); showBoard(syncBoard(board))` to put one stone at `A1`.
